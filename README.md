@@ -80,7 +80,7 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
 	 ```
 </br>
 
-## CIFAR-10 classification results
+## CIFAR-10 classification results (without data augmentation)
   ```C++
   20-layer plain
   type_layer[] = {"CIFAR-10", "Cbn,fs3", 
@@ -93,7 +93,7 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
   
   20-layer residual
   type_layer[] = {"CIFAR-10", "Cbn,fs3 /sc", 
-  		"Cbn,fs3",     "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
+  		"Cbn,fs3",     "Cbn,fs3 /sc2",      "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
 			"Cbn,fs3,st2", "Cbn,fs3 /psc2,st2", "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
 			"Cbn,fs3,st2", "Cbn,fs3 /psc2,st2", "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
 			"Pavg", "Lce,sm"};
