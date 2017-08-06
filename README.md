@@ -41,7 +41,7 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
     ""   : default is ReLU
     
     > Shourtcut connections (original version https://arxiv.org/pdf/1512.03385.pdf)
-    "/sc"       : starting layer
+    "/sc"       : start shortcut connections
     "/scn"      : identity shortcut connected to the (i - n)th layer
     "/pscn"     : projection shortcut connected to the (i - n)th layer for increasing dimension or reducing feature map size
     "/pscn,stn" : stride can be set in case of projection shortcut
@@ -59,6 +59,9 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
     "avg"  : Average Pooling
     "max"  : Max Pooling
     "pad"  : Zero Padding (it should be used to increase the size of the feature map)
+    
+    > Shourtcut connections
+    "/sc"  : start shortcut connections
     
     stride and pooling size is (length_map[i - 1] / length_map[i])^2    
     overlapped pooling is not supported.
