@@ -35,14 +35,14 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
   	```
     C(connecting/convolution)
     > Activation Function
-    "ls"  : Logistic Sigmoid
-    "ht"  : Hyperbolic Tangent
-    ""    : default is ReLU
+    "ls" : Logistic Sigmoid
+    "ht" : Hyperbolic Tangent
+    ""   : default is ReLU
     
     > Shourtcut connections (original version https://arxiv.org/pdf/1512.03385.pdf)
-    "/sc"   	: starting layer
-    "/scn"  	: identity shortcut connected to the (i - n)th layer
-    "/pscn"	: projection shortcut connected to the (i - n)th layer for increasing dimension or reducing feature map size
+    "/sc"       : starting layer
+    "/scn"      : identity shortcut connected to the (i - n)th layer
+    "/pscn"     : projection shortcut connected to the (i - n)th layer for increasing dimension or reducing feature map size
     "/pscn,stn" : stride can be set in case of projection shortcut
     
     > Property
@@ -50,8 +50,8 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
     "stn" : setting stride to n         [default stride      : 1]
 
     > Regularization
-    "bn"    : Batch Normalization
-    "do.f"  : Dropout with rate 0.f, each neurons is set to zero with a probability of (1 - 0.f)
+    "bn"   : Batch Normalization
+    "do.f" : Dropout with rate 0.f, each neurons is set to zero with a probability of (1 - 0.f)
     ----------------------------------------------------------------------------------------------------
     P(pooling)
     > Type
@@ -66,16 +66,16 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
    
 	 ```
 	 > Loss Function
-	 "ce"   : Cross Entropy
-	 "mse"	: Mean Squared Error
+	 "ce"  : Cross Entropy
+	 "mse" : Mean Squared Error
 	 
 	 > Activation Function for "ce"
-	 "sm"	: Softmax
+	 "sm" : Softmax
 	 ""   : default is Logistic Sigmoid
 
 	 > Activation Function for "mse"
-	 "ht"	: Hyperbolic Tangent
-	 "ia"	: Identity Activation f(x) = x
+	 "ht" : Hyperbolic Tangent
+	 "ia" : Identity Activation f(x) = x
 	 ""   : default is Logistic Sigmoid
 	 ```
 </br>
