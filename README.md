@@ -1,4 +1,4 @@
-# CNN
+# CNN-cuda
 CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR-10 datasets.</br></br>
 
 ## Features
