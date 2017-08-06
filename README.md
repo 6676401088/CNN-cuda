@@ -40,9 +40,10 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
     ""    : default is ReLU
     
     > Shourtcut connections (original version https://arxiv.org/pdf/1512.03385.pdf)
-    "/sc"   : starting layer
-    "/scn"  : identity shortcut connected to the (i - n)th layer
-    "/pscn" : projection shortcut connected to the (i - n)th layer for increasing dimension or reducing feature map size
+    "/sc"   	: starting layer
+    "/scn"  	: identity shortcut connected to the (i - n)th layer
+    "/pscn"	: projection shortcut connected to the (i - n)th layer for increasing dimension or reducing feature map size
+    "/pscn,stn" : stride can be set in case of projection shortcut
     
     > Property
     "fsn" : setting filter size to n^2  [default filter size : (length_map[i - 1] - length_map[i] + 1)^2]
@@ -80,4 +81,23 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
 </br>
 
 ## CIFAR-10 classification results
+  ```C++
+  20-layer plain
+  type_layer[] = {"CIFAR-10", "Cbn,fs3", 
+  		"Cbn,fs3",     "Cbn,fs3", "Cbn,fs3", "Cbn,fs3", "Cbn,fs3", "Cbn,fs3",
+			"Cbn,fs3,st2", "Cbn,fs3", "Cbn,fs3", "Cbn,fs3", "Cbn,fs3", "Cbn,fs3",
+			"Cbn,fs3,st2", "Cbn,fs3", "Cbn,fs3", "Cbn,fs3", "Cbn,fs3", "Cbn,fs3",
+			"Pavg", "Lce,sm"};
+  length_map[] = {32, 32, 32, 32, 32, 32, 32, 32, 16, 16, 16, 16, 16, 16,  8,  8,  8,  8,  8,  8,  1,  1};
+  number_map[] = { 3, 16, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 64, 64, 64, 64, 64, 64, 64, 10};
+  
+  20-layer residual
+  type_layer[] = {"CIFAR-10", "Cbn,fs3 /sc", 
+  		"Cbn,fs3",     "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
+			"Cbn,fs3,st2", "Cbn,fs3 /psc2,st2", "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
+			"Cbn,fs3,st2", "Cbn,fs3 /psc2,st2", "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
+			"Pavg", "Lce,sm"};
+  length_map[] = {32, 32, 32, 32, 32, 32, 32, 32, 16, 16, 16, 16, 16, 16,  8,  8,  8,  8,  8,  8,  1,  1};
+  number_map[] = { 3, 16, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 64, 64, 64, 64, 64, 64, 64, 10};
+  ```
 ![result](/result.PNG)
