@@ -46,8 +46,8 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
     "/pscn,stn" : stride can be set in case of projection shortcut
     
     > Property
-    "fsn" : setting filter size to n^2  [default filter size : (length_map[i - 1] - length_map[i] + 1)^2]
-    "stn" : setting stride to n         [default stride      : 1]
+    "fsn"  : setting filter size to n^2  [default filter size : (length_map[i - 1] - length_map[i] + 1)^2]
+    "stn"  : setting stride to n         [default stride      : 1]
 
     > Regularization
     "bn"   : Batch Normalization
@@ -55,9 +55,9 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
     ----------------------------------------------------------------------------------------------------
     P(pooling)
     > Type
-    "avg" : Average Pooling
-    "max" : Max Pooling
-    "pad" : Zero Padding (it should be used to increase the size of the feature map)
+    "avg"  : Average Pooling
+    "max"  : Max Pooling
+    "pad"  : Zero Padding (it should be used to increase the size of the feature map)
     
     stride and pooling size is (length_map[i - 1] / length_map[i])^2    
     overlapped pooling is not supported.
@@ -70,13 +70,13 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
 	 "mse" : Mean Squared Error
 	 
 	 > Activation Function for "ce"
-	 "sm" : Softmax
-	 ""   : default is Logistic Sigmoid
+	 "sm"  : Softmax
+	 ""    : default is Logistic Sigmoid
 
 	 > Activation Function for "mse"
-	 "ht" : Hyperbolic Tangent
-	 "ia" : Identity Activation f(x) = x
-	 ""   : default is Logistic Sigmoid
+	 "ht"  : Hyperbolic Tangent
+	 "ia"  : Identity Activation f(x) = x
+	 ""    : default is Logistic Sigmoid
 	 ```
 </br>
 
