@@ -732,7 +732,7 @@ void Convolutional_Neural_Networks_CUDA::Differentiate(int layer_index, float le
 				// derivative = derivative;
 			}
 			else{
-				::Differentiate<<<number_memory / NUMBER_THREAD + 1, NUMBER_THREAD>>>(1, number_memory, learning_rate, derivative, neuron, target_output);
+				// derivative = derivative;
 			}
 		}
 		else
