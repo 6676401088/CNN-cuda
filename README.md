@@ -31,7 +31,7 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
   154: int number_map[]    = { 3, 16, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 64, 64, 64, 64, 64, 64, 64, 10};
   ```  
   - There is no type for input layer but "MNIST" and "CIFAR-10" are used to select the data to be read in main()
-  - Type start with 'C(connecting/convolution)' and 'P(pooling)' is for hidden layer.
+  - Type start with 'C(connecting/convolution)' and 'P(padding/pooling)' is for hidden layer.
   
   	```
     C(connecting/convolution)
@@ -54,7 +54,7 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
     "bn"   : Batch Normalization
     "do.f" : Dropout with rate 0.f, each neurons is set to zero with a probability of (1 - 0.f)
     ----------------------------------------------------------------------------------------------------
-    P(pooling)
+    P(padding/pooling)
     > Type
     "avg"  : Average Pooling
     "max"  : Max Pooling
