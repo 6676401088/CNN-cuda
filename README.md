@@ -4,13 +4,13 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
 ## Features
 - Multi-GPU is not supported.
 - Support Batch Normalization, Dropout and Shortcut connections for residual learning.
-- To classify MNIST handwritten digits, followed files are required from http://yann.lecun.com/exdb/mnist/
+- To classify MNIST handwritten digits, following files are required from http://yann.lecun.com/exdb/mnist/
   - train-images.idx3-ubyte
   - train-labels.idx1-ubyte
   - t10k-images.idx3-ubyte
   - t10k-labels.idx1-ubyte
   
-- To classify CIFAR-10 datasets, followd files are required from https://www.cs.toronto.edu/~kriz/cifar.html<br><br>
+- To classify CIFAR-10 datasets, following files are required from https://www.cs.toronto.edu/~kriz/cifar.html<br><br>
   CIFAR-10 binary version (suitable for C programs)
   - data_batch_1.bin
   - data_batch_2.bin
