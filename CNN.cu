@@ -250,7 +250,7 @@ __global__ void ::Batch_Normalization_Adjust_Parameter(int batch_size, int lengt
 		}
 	}
 	if(threadIdx.x == 0){
-		gamma[j] -= sum[0] / (length_map * length_map);
+		gamma[j] -= sum[0];
 	}
 
 	sum[threadIdx.x] = 0;
@@ -270,7 +270,7 @@ __global__ void ::Batch_Normalization_Adjust_Parameter(int batch_size, int lengt
 		}
 	}
 	if(threadIdx.x == 0){
-		beta[j] -= sum[0] / (length_map * length_map);
+		beta[j] -= sum[0];
 	}
 }
 __global__ void ::Batch_Normalization_Differentiate(int batch_size, int length_map, int number_map, float epsilon, float gamma[], float beta[], float mean[], float variance[], float derivative[], float derivative_batch_0[], float derivative_batch_1[], float neuron_batch_1[]){
