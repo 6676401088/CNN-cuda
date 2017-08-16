@@ -1194,6 +1194,8 @@ void Convolutional_Neural_Networks_CUDA::Save_Parameter(char path[]){
 					for(int j = 0;j < number_map[i];j++){
 						fprintf(file, "%f\n", gamma[h][i][j]);
 						fprintf(file, "%f\n", beta[h][i][j]);
+						fprintf(file, "%f\n", mean[h][i][j]);
+						fprintf(file, "%f\n", variance[h][i][j]);
 					}
 				}
 
@@ -1240,6 +1242,8 @@ float Convolutional_Neural_Networks_CUDA::Load_Parameter(char path[]){
 						for(int j = 0;j < number_map[i];j++){
 							fscanf(file, "%f", &gamma[h][i][j]);
 							fscanf(file, "%f", &beta[h][i][j]);
+							fscanf(file, "%f", &mean[h][i][j]);
+							fscanf(file, "%f", &variance[h][i][j]);
 						}
 					}
 
