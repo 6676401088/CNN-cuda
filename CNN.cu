@@ -1187,7 +1187,7 @@ void Convolutional_Neural_Networks_CUDA::Initialize_Parameter(int seed){
 void Convolutional_Neural_Networks_CUDA::Save_Parameter(char path[]){
 	FILE *file = fopen(path, "wt");
 
-	fprintf(file, "%.12f\n", epsilon);
+	fprintf(file, "%f\n", epsilon);
 
 	for(int h = 0;h < number_parameter_type;h++){
 		for(int i = 0;i < number_layer;i++){
