@@ -250,7 +250,7 @@ __global__ void ::Batch_Normalization_Adjust_Parameter(int batch_size, int lengt
 		}
 	}
 	if(threadIdx.x == 0){
-		gamma[j] -= sum[0];
+		gamma[j] -= sum[0];// / (length_map * length_map);
 	}
 
 	sum[threadIdx.x] = 0;
@@ -270,7 +270,7 @@ __global__ void ::Batch_Normalization_Adjust_Parameter(int batch_size, int lengt
 		}
 	}
 	if(threadIdx.x == 0){
-		beta[j] -= sum[0];
+		beta[j] -= sum[0];// / (length_map * length_map);
 	}
 }
 __global__ void ::Batch_Normalization_Differentiate(int batch_size, int length_map, int number_map, float epsilon, float gamma[], float beta[], float mean[], float variance[], float derivative[], float derivative_batch_0[], float derivative_batch_1[], float neuron_batch_1[]){
@@ -1061,8 +1061,8 @@ Convolutional_Neural_Networks_CUDA::Convolutional_Neural_Networks_CUDA(char **ty
 				cudaMallocManaged(&beta[h][i],			sizeof(float) * number_map[i]);
 				cudaMallocManaged(&mean[h][i],			sizeof(float) * number_map[i]);
 				cudaMallocManaged(&variance[h][i],		sizeof(float) * number_map[i]);
-				cudaMallocManaged(&sum_mean[h][i],		sizeof(float) * number_map[i]);
-				cudaMallocManaged(&sum_variance[h][i],	sizeof(float) * number_map[i]);
+				cudaMalloc		 (&sum_mean[h][i],		sizeof(float) * number_map[i]);
+				cudaMalloc		 (&sum_variance[h][i],	sizeof(float) * number_map[i]);
 			}
 		}
 	}
@@ -1184,6 +1184,39 @@ void Convolutional_Neural_Networks_CUDA::Initialize_Parameter(int seed){
 		}
 	}
 }
+void Convolutional_Neural_Networks_CUDA::Load_Parameter(char path[]){
+	FILE *file = fopen(path, "rt");
+
+	if(file){
+		fscanf(file, "%f", &epsilon);
+
+		for(int h = 0;h < number_parameter_type;h++){
+			for(int i = 0;i < number_layer;i++){
+				if(Access_Parameter(h, i)){
+					if(strstr(type_layer[i], "bn")){
+						for(int j = 0;j < number_map[i];j++){
+							fscanf(file, "%f", &gamma[h][i][j]);
+							fscanf(file, "%f", &beta[h][i][j]);
+							fscanf(file, "%f", &mean[h][i][j]);
+							fscanf(file, "%f", &variance[h][i][j]);
+						}
+					}
+
+					int lower_layer_index	= (h == 1) ? (i - atoi(strstr(type_layer[i], "sc") + 2)):(i - 1);
+					int number_parameter	= number_map[i] * (number_map[lower_layer_index] + 1) * length_filter[i] * length_filter[i];
+
+					for(int j = 0;j < number_parameter;j++){
+						fscanf(file, "%f", &weight[h][i][j]);
+					}
+				}
+			}
+		}
+		fclose(file);
+	}
+	else{
+		fprintf(stderr, "[Load_Parameter], %s not found.\n", path);
+	}
+}
 void Convolutional_Neural_Networks_CUDA::Save_Parameter(char path[]){
 	FILE *file = fopen(path, "wt");
 
@@ -1229,42 +1262,6 @@ void Convolutional_Neural_Networks_CUDA::Test(int batch_size, float **input, flo
 	}
 }
 
-float Convolutional_Neural_Networks_CUDA::Load_Parameter(char path[]){
-	float epsilon = 0;
-
-	FILE *file = fopen(path, "rt");
-
-	if(file){
-		fscanf(file, "%f", &epsilon);
-
-		for(int h = 0;h < number_parameter_type;h++){
-			for(int i = 0;i < number_layer;i++){
-				if(Access_Parameter(h, i)){
-					if(strstr(type_layer[i], "bn")){
-						for(int j = 0;j < number_map[i];j++){
-							fscanf(file, "%f", &gamma[h][i][j]);
-							fscanf(file, "%f", &beta[h][i][j]);
-							fscanf(file, "%f", &mean[h][i][j]);
-							fscanf(file, "%f", &variance[h][i][j]);
-						}
-					}
-
-					int lower_layer_index	= (h == 1) ? (i - atoi(strstr(type_layer[i], "sc") + 2)):(i - 1);
-					int number_parameter	= number_map[i] * (number_map[lower_layer_index] + 1) * length_filter[i] * length_filter[i];
-
-					for(int j = 0;j < number_parameter;j++){
-						fscanf(file, "%f", &weight[h][i][j]);
-					}
-				}
-			}
-		}
-		fclose(file);
-	}
-	else{
-		fprintf(stderr, "[Load_Parameter], %s not found.\n", path);
-	}
-	return epsilon;
-}
 float Convolutional_Neural_Networks_CUDA::Train(int batch_size, int number_train, float epsilon, float learning_rate, float **input, float **target_output){
 	int *index = new int[number_train];
 
