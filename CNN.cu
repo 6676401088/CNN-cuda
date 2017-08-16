@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NUMBER_THREAD 32
+#define NUMBER_THREAD 32 // must be a power of 2
 
 __global__ void ::Activate(int option, int number_neuron, float neuron[]){
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
