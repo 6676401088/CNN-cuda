@@ -1172,6 +1172,8 @@ void Convolutional_Neural_Networks_CUDA::Initialize_Parameter(int seed){
 				if(strstr(type_layer[i], "bn")){
 					Set<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], 1, gamma[h][i]);
 					Set<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], 0, beta[h][i]);
+					Set<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], 0, mean[h][i]);
+					Set<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], 0, variance[h][i]);
 				}
 
 				int lower_layer_index	= (h == 1) ? (i - atoi(strstr(type_layer[i], "sc") + 2)):(i - 1);
