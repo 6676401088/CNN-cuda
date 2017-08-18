@@ -1245,18 +1245,27 @@ void Convolutional_Neural_Networks_CUDA::Save_Parameter(char path[]){
 	}
 	fclose(file);
 }
+void Convolutional_Neural_Networks_CUDA::Test(float input[], float output[]){
+	Resize_Memory(1);
+
+	cudaMemcpy(neuron[0][0], input, sizeof(float) * number_map[0] * length_map[0] * length_map[0], cudaMemcpyHostToDevice);
+
+	for(int i = 1;i < number_layer;i++){
+		Feedforward	(i);
+		Activate	("test", i);
+	}
+	cudaMemcpy(output, neuron[0][number_layer - 1], sizeof(float) * number_map[number_layer - 1], cudaMemcpyDeviceToHost);
+}
 void Convolutional_Neural_Networks_CUDA::Test(int batch_size, float **input, float **output){
 	Resize_Memory(batch_size);
 
 	for(int h = 0, i = 0;h < batch_size;h++){
 		cudaMemcpy(&neuron[0][i][h * number_map[i] * length_map[i] * length_map[i]], input[h], sizeof(float) * number_map[i] * length_map[i] * length_map[i], cudaMemcpyHostToDevice);
 	}
-
 	for(int i = 1;i < number_layer;i++){
 		Feedforward	(i);
 		Activate	("test", i);
 	}
-
 	for(int h = 0, i = number_layer - 1;h < batch_size;h++){
 		cudaMemcpy(output[h], &neuron[0][i][h * number_map[i]], sizeof(float) * number_map[i], cudaMemcpyDeviceToHost);
 	}
