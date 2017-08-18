@@ -69,7 +69,7 @@ private:
 	bool Access_Parameter(int type_index, int layer_index);
 public:
 	Convolutional_Neural_Networks_CUDA(char **type_layer, int number_layer, int length_map[], int number_map[]);
-    ~Convolutional_Neural_Networks_CUDA();
+	~Convolutional_Neural_Networks_CUDA();
 
 	void Initialize_Parameter(int seed);
 	void Load_Parameter(char path[]);
