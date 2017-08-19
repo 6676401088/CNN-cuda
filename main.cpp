@@ -157,7 +157,7 @@ int main(){
 	int number_test		 = 10000;
 
 	float epsilon		= 0.001;
-	float learning_rate	= 0.005;
+	float learning_rate	= 0.002;
 
 	float **input			= new float*[number_train + number_test];
 	float **target_output	= new float*[number_train + number_test];
