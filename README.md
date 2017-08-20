@@ -54,7 +54,7 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
     "bn"   : Batch Normalization
     "do.f" : Dropout with rate 0.f, each neurons is set to zero with a probability of (1 - 0.f)
     ----------------------------------------------------------------------------------------------------
-    P(padding/pooling)
+    P(padding/pooling)
     > Type
     "avg"  : Average Pooling
     "max"  : Max Pooling
