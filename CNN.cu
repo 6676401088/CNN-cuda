@@ -944,18 +944,6 @@ void Convolutional_Neural_Networks_CUDA::Resize_Memory(int batch_size){
 				}
 			}
 		}
-		for(int h = 0;h < number_parameter_type;h++){
-			for(int i = 0;i < number_layer;i++){
-				if(Access_Parameter(h, i)){
-					int lower_layer_index	= (h == 1) ? (i - atoi(strstr(type_layer[i], "psc") + 2)):(i - 1);
-					int number_parameter	= number_map[i] * (number_map[lower_layer_index] + 1) * length_filter[i] * length_filter[i];
-
-					if(number_parameter / NUMBER_THREAD + 1 > 65535){
-						fprintf(stderr, "[required gridDim: %d > 65535], (NUMBER_THREAD: %d) must be a higher value.\nplease refer to the CNN.cu/line 11\n", number_parameter / NUMBER_THREAD + 1, NUMBER_THREAD);
-					}
-				}
-			}
-		}
 		this->batch_size = batch_size;
 	}
 }
@@ -1094,6 +1082,9 @@ Convolutional_Neural_Networks_CUDA::Convolutional_Neural_Networks_CUDA(char **ty
 				int lower_layer_index	= (h == 1) ? (i - atoi(strstr(type_layer[i], "psc") + 2)):(i - 1);
 				int number_parameter	= number_map[i] * (number_map[lower_layer_index] + 1) * length_filter[i] * length_filter[i];
 
+				if(number_parameter / NUMBER_THREAD + 1 > 65535){
+					fprintf(stderr, "[required gridDim: %d > 65535], (NUMBER_THREAD: %d) must be a higher value.\nplease refer to the CNN.cu/line 11\n", number_parameter / NUMBER_THREAD + 1, NUMBER_THREAD);
+				}
 				cudaMallocManaged(&weight[h][i], sizeof(float) * number_parameter);
 			}
 		}
