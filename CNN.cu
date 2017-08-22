@@ -1023,7 +1023,7 @@ Convolutional_Neural_Networks_CUDA::Convolutional_Neural_Networks_CUDA(char **ty
 		char *type = strtok(this->type_layer[i], "/");
 
 		if(strstr(type, "fs"))	length_filter[i] = atoi(strstr(type, "fs") + 2);
-		else					length_filter[i] = length_map[i - 1] - length_map[i] + 1;
+		else					length_filter[i] = this->length_map[i - 1] - this->length_map[i] + 1;
 
 		if(strstr(type, "st"))	stride[i] = atoi(strstr(type, "st") + 2);
 		else					stride[i] = 1;
