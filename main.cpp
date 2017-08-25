@@ -171,7 +171,7 @@ int main(){
 	if(!strcmp(type_layer[0], "CIFAR-10"))	Read_Data("CIFAR-10", "", number_train, number_test, input, target_output);
 	if(!strcmp(type_layer[0], "MNIST"))		Read_Data("MNIST", "", number_train, number_test, input, target_output);
 
-	CNN->Initialize_Parameter(0);
+	CNN->Initialize_Parameter(0, 0.2, -0.1);
 
 	for(int g = 0, time = clock();g < number_iteration;g++){
 		int number_correct[2] = {0, };
