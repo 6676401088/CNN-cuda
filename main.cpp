@@ -4,7 +4,7 @@
 
 #include "CNN.cuh"
 
-void Read_Data(char data[], char folder_path[], int number_train, int number_test, float **input, float **target_output){
+void Read_Data(char data[], char folder_path[], int number_training, int number_test, float **input, float **target_output){
 	char path[6][255];
 
 	if(!strcmp(data, "CIFAR-10")){
@@ -15,15 +15,14 @@ void Read_Data(char data[], char folder_path[], int number_train, int number_tes
 
 			strcpy(path[g], folder_path);
 			strcat(path[g], filename[g]);
-			file = fopen(path[g], "rb");
 
-			if(file){
+			if(file = fopen(path[g], "rb")){
 				for(int i = 0;i < 10000;h++, i++){
-					if(h == number_train && g < 4){
+					if(h == number_training && g < 4){
 						g = 4;
 						break;
 					}
-					if(h == number_train + number_test){
+					if(h == number_training + number_test){
 						g = 5;
 						break;
 					}
@@ -43,7 +42,7 @@ void Read_Data(char data[], char folder_path[], int number_train, int number_tes
 				fclose(file);
 			}
 			else{
-				fprintf(stderr, "[Read_Data], %s not found.\n", path[g]);
+				fprintf(stderr, "[Read_Data], %s not found\n", path[g]);
 			}
 		}
 	}
@@ -57,13 +56,12 @@ void Read_Data(char data[], char folder_path[], int number_train, int number_tes
 			strcpy(path[g], folder_path);
 			strcat(path[g], filename[g]);
 		}
-		file = fopen(path[0], "rb");
 
-		if(file){
+		if(file = fopen(path[0], "rb")){
 			for(int h = 0, value;h < 4;h++){
 				fread(&value, sizeof(int), 1, file);
 			}
-			for(int h = 0;h < number_train;h++){
+			for(int h = 0;h < number_training;h++){
 				unsigned char pixel;
 
 				for(int j = 0;j < 28 * 28;j++){
@@ -74,16 +72,14 @@ void Read_Data(char data[], char folder_path[], int number_train, int number_tes
 			fclose(file);
 		}
 		else{
-			fprintf(stderr, "[Read_Data], %s not found.\n", path[0]);
+			fprintf(stderr, "[Read_Data], %s not found\n", path[0]);
 		}
 
-		file = fopen(path[1], "rb");
-
-		if(file){
+		if(file = fopen(path[1], "rb")){
 			for(int h = 0, value;h < 2;h++){
 				fread(&value, sizeof(int), 1, file);
 			}
-			for(int h = 0;h < number_train;h++){
+			for(int h = 0;h < number_training;h++){
 				unsigned char label;
 
 				fread(&label, sizeof(unsigned char), 1, file);
@@ -95,16 +91,14 @@ void Read_Data(char data[], char folder_path[], int number_train, int number_tes
 			fclose(file);
 		}
 		else{
-			fprintf(stderr, "[Read_Data], %s not found.\n", path[1]);
+			fprintf(stderr, "[Read_Data], %s not found\n", path[1]);
 		}
 
-		file = fopen(path[2], "rb");
-
-		if(file){
+		if(file = fopen(path[2], "rb")){
 			for(int h = 0, value;h < 4;h++){
 				fread(&value, sizeof(int), 1, file);
 			}
-			for(int h = number_train;h < number_train + number_test;h++){
+			for(int h = number_training;h < number_training + number_test;h++){
 				unsigned char pixel;
 
 				for(int j = 0;j < 28 * 28;j++){
@@ -115,16 +109,14 @@ void Read_Data(char data[], char folder_path[], int number_train, int number_tes
 			fclose(file);
 		}
 		else{
-			fprintf(stderr, "[Read_Data], %s not found.\n", path[2]);
+			fprintf(stderr, "[Read_Data], %s not found\n", path[2]);
 		}
 
-		file = fopen(path[3], "rb");
-
-		if(file){
+		if(file = fopen(path[3], "rb")){
 			for(int h = 0, value;h < 2;h++){
 				fread(&value, sizeof(int), 1, file);
 			}
-			for(int h = number_train;h < number_train + number_test;h++){
+			for(int h = number_training;h < number_training + number_test;h++){
 				unsigned char label;
 
 				fread(&label, sizeof(unsigned char), 1, file);
@@ -136,7 +128,7 @@ void Read_Data(char data[], char folder_path[], int number_train, int number_tes
 			fclose(file);
 		}
 		else{
-			fprintf(stderr, "[Read_Data], %s not found.\n", path[3]);
+			fprintf(stderr, "[Read_Data], %s not found\n", path[3]);
 		}
 	}
 }
