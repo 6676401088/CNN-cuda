@@ -10,8 +10,7 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
   - t10k-images.idx3-ubyte
   - t10k-labels.idx1-ubyte
   
-- To classify CIFAR-10 datasets, following files are required from https://www.cs.toronto.edu/~kriz/cifar.html<br><br>
-  CIFAR-10 binary version (suitable for C programs)
+- To classify CIFAR-10 datasets, following files are required from https://www.cs.toronto.edu/~kriz/cifar.html
   - data_batch_1.bin
   - data_batch_2.bin
   - data_batch_3.bin
@@ -19,7 +18,7 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
   - data_batch_5.bin
   - test_batch.bin
 
-- The network structure is determined by three parameters in the main.cpp at initialization.
+- The network structure is determined by three variables in the main.cpp.
 
   ```C++
   146: char *type_layer[] = {"CIFAR-10", "Cbn,fs3 /sc",
@@ -30,7 +29,7 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
   153: int length_map[]    = {32,	32, 32, 32, 32, 32, 32, 32, 16, 16, 16, 16, 16, 16,  8,  8,  8,  8,  8,  8,  1,  1};
   154: int number_map[]    = { 3, 16, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 64, 64, 64, 64, 64, 64, 64, 10};
   ```  
-  - There is no type for input layer but "MNIST" and "CIFAR-10" are used to select the data to be read in main()
+  - There is no type for input layer but "MNIST" and "CIFAR-10" are used to select the data to be read in the main
   - Type start with 'C(connecting/convolution)' and 'P(padding/pooling)' is for hidden layer.
   
   	```
@@ -63,8 +62,7 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
     > Shourtcut connections
     "/sc"  : start shortcut connections
     
-    stride and pooling size is (length_map[i - 1] / length_map[i])^2    
-    overlapped pooling is not supported.
+    stride and pooling size is (length_map[i - 1] / length_map[i])^2 and overlapped pooling is not supported.
 	  ```
    - Type start with 'L(loss)' is for output layer.
    
