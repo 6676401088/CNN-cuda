@@ -21,13 +21,13 @@ cuda implementation of Convolutional Neural Networks.</br></br>
 - The network structure is determined by three variables in the main.cpp.
 
   ```C++
-  146: char *type_layer[] = {"CIFAR-10", "Cbn,fs3 /sc",
+  137: char *type_layer[] = {"CIFAR-10", "Cbn,fs3 /sc",
                               "Cbn,fs3",     "Cbn,fs3 /sc2",      "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
                               "Cbn,fs3,st2", "Cbn,fs3 /psc2,st2", "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
                               "Cbn,fs3,st2", "Cbn,fs3 /psc2,st2", "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
                               "Pavg", "Lce,sm"};
-  153: int length_map[]    = {32,	32, 32, 32, 32, 32, 32, 32, 16, 16, 16, 16, 16, 16,  8,  8,  8,  8,  8,  8,  1,  1};
-  154: int number_map[]    = { 3, 16, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 64, 64, 64, 64, 64, 64, 64, 10};
+  144: int length_map[]    = {32,	32, 32, 32, 32, 32, 32, 32, 16, 16, 16, 16, 16, 16,  8,  8,  8,  8,  8,  8,  1,  1};
+  145: int number_map[]    = { 3, 16, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 64, 64, 64, 64, 64, 64, 64, 10};
   ```  
   - There is no type for input layer but "MNIST" and "CIFAR-10" are used to select the data to be read in the main
   - Type start with 'C(connecting/convolution)' and 'P(padding/pooling)' is for hidden layer.
