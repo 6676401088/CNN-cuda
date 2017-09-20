@@ -71,11 +71,11 @@ public:
 	Convolutional_Neural_Networks_CUDA(char **type_layer, int number_layer, int length_map[], int number_map[]);
 	~Convolutional_Neural_Networks_CUDA();
 
-	void Initialize_Parameter(int seed);
+	void Initialize_Parameter(int seed, double scale, double shift);
 	void Load_Parameter(char path[]);
 	void Save_Parameter(char path[]);
 	void Test(float input[], float output[]);
 	void Test(int batch_size, float **input, float **output);
 
-	float Train(int batch_size, int number_train, float epsilon, float learning_rate, float **input, float **target_output);
+	float Train(int batch_size, int number_training, float epsilon, float learning_rate, float **input, float **target_output);
 };
