@@ -1,5 +1,5 @@
 # CNN-cuda
-CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR-10 datasets.</br></br>
+cuda implementation of Convolutional Neural Networks.</br></br>
 
 ## Features
 - Multi-GPU is not supported.
@@ -82,5 +82,5 @@ CUDA implementation of Convolutional Neural Networks classifying MNIST and CIFAR
 	 ```
 </br>
 
-## CIFAR-10 classification results (without data augmentation)
+## CIFAR-10 classification result (without data augmentation)
 ![result](/result.png)
