@@ -4,7 +4,7 @@
 
 #include "CNN.cuh"
 
-void Read_Data(char data[], char folder_path[], int number_training, int number_test, float **input, float **target_output){
+void Read_Data(char data[], char folder_path[], int number_traininging, int number_test, float **input, float **target_output){
 	char path[6][255];
 
 	if(!strcmp(data, "CIFAR-10")){
@@ -18,11 +18,11 @@ void Read_Data(char data[], char folder_path[], int number_training, int number_
 
 			if(file = fopen(path[g], "rb")){
 				for(int i = 0;i < 10000;h++, i++){
-					if(h == number_training && g < 4){
+					if(h == number_traininging && g < 4){
 						g = 4;
 						break;
 					}
-					if(h == number_training + number_test){
+					if(h == number_traininging + number_test){
 						g = 5;
 						break;
 					}
@@ -61,7 +61,7 @@ void Read_Data(char data[], char folder_path[], int number_training, int number_
 			for(int h = 0, value;h < 4;h++){
 				fread(&value, sizeof(int), 1, file);
 			}
-			for(int h = 0;h < number_training;h++){
+			for(int h = 0;h < number_traininging;h++){
 				unsigned char pixel;
 
 				for(int j = 0;j < 28 * 28;j++){
@@ -79,7 +79,7 @@ void Read_Data(char data[], char folder_path[], int number_training, int number_
 			for(int h = 0, value;h < 2;h++){
 				fread(&value, sizeof(int), 1, file);
 			}
-			for(int h = 0;h < number_training;h++){
+			for(int h = 0;h < number_traininging;h++){
 				unsigned char label;
 
 				fread(&label, sizeof(unsigned char), 1, file);
@@ -98,7 +98,7 @@ void Read_Data(char data[], char folder_path[], int number_training, int number_
 			for(int h = 0, value;h < 4;h++){
 				fread(&value, sizeof(int), 1, file);
 			}
-			for(int h = number_training;h < number_training + number_test;h++){
+			for(int h = number_traininging;h < number_traininging + number_test;h++){
 				unsigned char pixel;
 
 				for(int j = 0;j < 28 * 28;j++){
@@ -116,7 +116,7 @@ void Read_Data(char data[], char folder_path[], int number_training, int number_
 			for(int h = 0, value;h < 2;h++){
 				fread(&value, sizeof(int), 1, file);
 			}
-			for(int h = number_training;h < number_training + number_test;h++){
+			for(int h = number_traininging;h < number_traininging + number_test;h++){
 				unsigned char label;
 
 				fread(&label, sizeof(unsigned char), 1, file);
@@ -145,30 +145,30 @@ int main(){
 	int number_map[]	 = { 3, 16, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 64, 64, 64, 64, 64, 64, 64, 10};
 	int number_iteration = 100;
 	int number_layer	 = sizeof(type_layer) / sizeof(type_layer[0]);
-	int number_train	 = 50000;
+	int number_training	 = 50000;
 	int number_test		 = 10000;
 
 	float epsilon		= 0.001;
 	float learning_rate	= 0.002;
 
-	float **input			= new float*[number_train + number_test];
-	float **target_output	= new float*[number_train + number_test];
+	float **input			= new float*[number_training + number_test];
+	float **target_output	= new float*[number_training + number_test];
 
 	Convolutional_Neural_Networks_CUDA *CNN = new Convolutional_Neural_Networks_CUDA(type_layer, number_layer, length_map, number_map);
 
-	for(int h = 0;h < number_train + number_test;h++){
+	for(int h = 0;h < number_training + number_test;h++){
 		input[h]		 = new float[number_map[0] * length_map[0] * length_map[0]];
 		target_output[h] = new float[number_map[number_layer - 1]];
 	}
-	if(!strcmp(type_layer[0], "CIFAR-10"))	Read_Data("CIFAR-10", "", number_train, number_test, input, target_output);
-	if(!strcmp(type_layer[0], "MNIST"))		Read_Data("MNIST", "", number_train, number_test, input, target_output);
+	if(!strcmp(type_layer[0], "CIFAR-10"))	Read_Data("CIFAR-10", "", number_training, number_test, input, target_output);
+	if(!strcmp(type_layer[0], "MNIST"))		Read_Data("MNIST", "", number_training, number_test, input, target_output);
 
 	CNN->Initialize_Parameter(0);
 
 	for(int g = 0, time = clock();g < number_iteration;g++){
 		int number_correct[2] = {0, };
 
-		float loss = CNN->Train(batch_size, number_train, epsilon, learning_rate, input, target_output);	
+		float loss = CNN->Train(batch_size, number_training, epsilon, learning_rate, input, target_output);	
 
 		float **output = new float*[batch_size];
 		
@@ -176,8 +176,8 @@ int main(){
 			output[h] = new float[number_map[number_layer - 1]];
 		}
 		// Do not calculate the accuracy of training data to reduce computational cost.
-		for(int i = number_train;i < number_train + number_test;i += batch_size){
-			int test_batch_size = (i + batch_size < number_train + number_test) ? (batch_size):(number_train + number_test - i);
+		for(int i = number_training;i < number_training + number_test;i += batch_size){
+			int test_batch_size = (i + batch_size < number_training + number_test) ? (batch_size):(number_training + number_test - i);
 
 			CNN->Test(test_batch_size, &input[i], output);
 
@@ -192,10 +192,10 @@ int main(){
 						max = output[h][j];
 					}
 				}
-				number_correct[(h + i < number_train) ? (0):(1)] += (int)target_output[h + i][argmax];
+				number_correct[(h + i < number_training) ? (0):(1)] += (int)target_output[h + i][argmax];
 			}
 		}
-		printf("score: %d / %d, %d / %d  loss: %lf  step %d  %.2lf sec\n", number_correct[0], number_train, number_correct[1], number_test, loss, g + 1, (float)(clock() - time) / CLOCKS_PER_SEC);
+		printf("score: %d / %d, %d / %d  loss: %lf  step %d  %.2lf sec\n", number_correct[0], number_training, number_correct[1], number_test, loss, g + 1, (float)(clock() - time) / CLOCKS_PER_SEC);
 		learning_rate *= 0.955;
 
 		for(int h = 0;h < batch_size;h++){
@@ -204,7 +204,7 @@ int main(){
 		delete[] output;
 	}
 
-	for(int h = 0;h < number_train + number_test;h++){
+	for(int h = 0;h < number_training + number_test;h++){
 		delete[] input[h];
 		delete[] target_output[h];
 	}
