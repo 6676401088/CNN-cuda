@@ -27,7 +27,7 @@ __global__ void ::Activate(int option, int number_neuron, float neuron[]){
 		}
 	}
 }
-__global__ void ::Add(int number_memory, float A[], float B[], float C[]){
+__global__ void Add(int number_memory, float A[], float B[], float C[]){
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 
 	if(j < number_memory){
@@ -587,11 +587,11 @@ void Convolutional_Neural_Networks_CUDA::Activate(char option[], int layer_index
 			char *rate = strstr(type_layer[i], "do") + 2;
 
 			if(!strcmp(option, "train")){
-				Dropout<<<number_memory / NUMBER_THREAD + 1, NUMBER_THREAD>>>(0, batch_size, number_map[i], length_map[i], clock(), atof(rate), neuron);
+				::Dropout<<<number_memory / NUMBER_THREAD + 1, NUMBER_THREAD>>>(0, batch_size, number_map[i], length_map[i], clock(), atof(rate), neuron);
 			}
 			else
 			if(!strcmp(option, "test")){
-				Dropout<<<number_memory / NUMBER_THREAD + 1, NUMBER_THREAD>>>(1, batch_size, number_map[i], length_map[i], clock(), atof(rate), neuron);
+				::Dropout<<<number_memory / NUMBER_THREAD + 1, NUMBER_THREAD>>>(1, batch_size, number_map[i], length_map[i], clock(), atof(rate), neuron);
 			}
 		}
 	}
@@ -698,7 +698,7 @@ void Convolutional_Neural_Networks_CUDA::Backpropagate(int layer_index){
 			else{
 				cudaMemcpy(derivative, upper_derivative, sizeof(float) * number_memory, cudaMemcpyDeviceToDevice);
 			}
-			Add<<<number_memory / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_memory, derivative, this->derivative[0][i], this->derivative[0][i]);
+			::Add<<<number_memory / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_memory, derivative, this->derivative[0][i], this->derivative[0][i]);
 		}
 	}
 }
@@ -1011,7 +1011,7 @@ Convolutional_Neural_Networks_CUDA::Convolutional_Neural_Networks_CUDA(char **ty
 		char *type = strtok(this->type_layer[i], "/");
 
 		if(strstr(type, "fs"))	length_filter[i] = atoi(strstr(type, "fs") + 2);
-		else					length_filter[i] = this->length_map[i - 1] - this->length_map[i] + 1;
+		else					length_filter[i] = (i == 0 || type_layer[i][0] == 'P') ? (0):(this->length_map[i - 1] - this->length_map[i] + 1);
 
 		if(strstr(type, "st"))	stride[i] = atoi(strstr(type, "st") + 2);
 		else					stride[i] = 1;
@@ -1045,12 +1045,12 @@ Convolutional_Neural_Networks_CUDA::Convolutional_Neural_Networks_CUDA(char **ty
 
 		for(int i = 0;i < number_layer;i++){
 			if(Access_Parameter(h, i) && strstr(type_layer[i], "bn")){
-				cudaMallocManaged(&gamma[h][i],			sizeof(float) * number_map[i]);
-				cudaMallocManaged(&beta[h][i],			sizeof(float) * number_map[i]);
-				cudaMallocManaged(&mean[h][i],			sizeof(float) * number_map[i]);
-				cudaMallocManaged(&variance[h][i],		sizeof(float) * number_map[i]);
-				cudaMalloc		 (&sum_mean[h][i],		sizeof(float) * number_map[i]);
-				cudaMalloc		 (&sum_variance[h][i],	sizeof(float) * number_map[i]);
+				cudaMalloc(&gamma[h][i],		sizeof(float) * number_map[i]);
+				cudaMalloc(&beta[h][i],			sizeof(float) * number_map[i]);
+				cudaMalloc(&mean[h][i],			sizeof(float) * number_map[i]);
+				cudaMalloc(&variance[h][i],		sizeof(float) * number_map[i]);
+				cudaMalloc(&sum_mean[h][i],		sizeof(float) * number_map[i]);
+				cudaMalloc(&sum_variance[h][i],	sizeof(float) * number_map[i]);
 			}
 		}
 	}
@@ -1085,7 +1085,7 @@ Convolutional_Neural_Networks_CUDA::Convolutional_Neural_Networks_CUDA(char **ty
 				if(number_parameter / NUMBER_THREAD + 1 > 65535){
 					fprintf(stderr, "[required gridDim: %d > 65535], (NUMBER_THREAD: %d) must be a higher value.\nplease refer to the CNN.cu/line 11\n", number_parameter / NUMBER_THREAD + 1, NUMBER_THREAD);
 				}
-				cudaMallocManaged(&weight[h][i], sizeof(float) * number_parameter);
+				cudaMalloc(&weight[h][i], sizeof(float) * number_parameter);
 			}
 		}
 	}
@@ -1156,19 +1156,19 @@ Convolutional_Neural_Networks_CUDA::~Convolutional_Neural_Networks_CUDA(){
 	cudaFree(number_map_factor);
 }
 
-void Convolutional_Neural_Networks_CUDA::Initialize_Parameter(int seed){
+void Convolutional_Neural_Networks_CUDA::Initialize_Parameter(int seed, double scale, double shift){
 	for(int h = 0;h < number_parameter_type;h++){
 		for(int i = 0;i < number_layer;i++){
 			if(Access_Parameter(h, i)){
 				if(strstr(type_layer[i], "bn")){
-					Set<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], 1, gamma[h][i]);
-					Set<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], 0, beta[h][i]);
+					::Set<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], 1, gamma[h][i]);
+					::Set<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], 0, beta[h][i]);
 				}
 
 				int lower_layer_index	= (h == 1) ? (i - atoi(strstr(type_layer[i], "sc") + 2)):(i - 1);
 				int number_parameter	= number_map[i] * (number_map[lower_layer_index] + 1) * length_filter[i] * length_filter[i];
 
-				Randomize<<<number_parameter / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_parameter, seed, 0.2, -0.1, weight[h][i]);
+				::Randomize<<<number_parameter / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_parameter, seed, scale, shift, weight[h][i]);
 			}
 		}
 	}
@@ -1182,28 +1182,39 @@ void Convolutional_Neural_Networks_CUDA::Load_Parameter(char path[]){
 		for(int h = 0;h < number_parameter_type;h++){
 			for(int i = 0;i < number_layer;i++){
 				if(Access_Parameter(h, i)){
+					float *parameter;
+
 					if(strstr(type_layer[i], "bn")){
-						for(int j = 0;j < number_map[i];j++){
-							fscanf(file, "%f", &gamma[h][i][j]);
-							fscanf(file, "%f", &beta[h][i][j]);
-							fscanf(file, "%f", &mean[h][i][j]);
-							fscanf(file, "%f", &variance[h][i][j]);
-						}
+						float *memory = new float[number_map[i]];
+
+						for(int j = 0;j < number_map[i];j++) fscanf(file, "%f", &memory[j]);
+						cudaMemcpy(gamma[h][i], memory,		sizeof(float) * number_map[i], cudaMemcpyHostToDevice);
+						for(int j = 0;j < number_map[i];j++) fscanf(file, "%f", &memory[j]);
+						cudaMemcpy(beta[h][i], memory,		sizeof(float) * number_map[i], cudaMemcpyHostToDevice);
+						for(int j = 0;j < number_map[i];j++) fscanf(file, "%f", &memory[j]);
+						cudaMemcpy(mean[h][i], memory,		sizeof(float) * number_map[i], cudaMemcpyHostToDevice);
+						for(int j = 0;j < number_map[i];j++) fscanf(file, "%f", &memory[j]);
+						cudaMemcpy(variance[h][i], memory,	sizeof(float) * number_map[i], cudaMemcpyHostToDevice);
+
+						delete[] memory;
 					}
 
 					int lower_layer_index	= (h == 1) ? (i - atoi(strstr(type_layer[i], "sc") + 2)):(i - 1);
 					int number_parameter	= number_map[i] * (number_map[lower_layer_index] + 1) * length_filter[i] * length_filter[i];
 
-					for(int j = 0;j < number_parameter;j++){
-						fscanf(file, "%f", &weight[h][i][j]);
-					}
+					parameter = new float[number_parameter];
+
+					for(int j = 0;j < number_parameter;j++)	fscanf(file, "%f", &parameter[j]);
+					cudaMemcpy(weight[h][i], parameter, sizeof(float) * number_parameter, cudaMemcpyHostToDevice);
+
+					delete[] parameter;
 				}
 			}
 		}
 		fclose(file);
 	}
 	else{
-		fprintf(stderr, "[Load_Parameter], %s not found.\n", path);
+		fprintf(stderr, "[Load_Parameter], %s not found\n", path);
 	}
 }
 void Convolutional_Neural_Networks_CUDA::Save_Parameter(char path[]){
@@ -1214,21 +1225,30 @@ void Convolutional_Neural_Networks_CUDA::Save_Parameter(char path[]){
 	for(int h = 0;h < number_parameter_type;h++){
 		for(int i = 0;i < number_layer;i++){
 			if(Access_Parameter(h, i)){
+				float *parameter;
+
 				if(strstr(type_layer[i], "bn")){
-					for(int j = 0;j < number_map[i];j++){
-						fprintf(file, "%f\n", gamma[h][i][j]);
-						fprintf(file, "%f\n", beta[h][i][j]);
-						fprintf(file, "%f\n", mean[h][i][j]);
-						fprintf(file, "%f\n", variance[h][i][j]);
-					}
+					float *memory = new float[number_map[i]];
+
+					cudaMemcpy(memory, gamma[h][i],		sizeof(float) * number_map[i], cudaMemcpyDeviceToHost);
+					for(int j = 0;j < number_map[i];j++) fprintf(file, "%f\n", memory[j]);
+					cudaMemcpy(memory, beta[h][i],		sizeof(float) * number_map[i], cudaMemcpyDeviceToHost);
+					for(int j = 0;j < number_map[i];j++) fprintf(file, "%f\n", memory[j]);
+					cudaMemcpy(memory, mean[h][i],		sizeof(float) * number_map[i], cudaMemcpyDeviceToHost);
+					for(int j = 0;j < number_map[i];j++) fprintf(file, "%f\n", memory[j]);
+					cudaMemcpy(memory, variance[h][i],	sizeof(float) * number_map[i], cudaMemcpyDeviceToHost);
+					for(int j = 0;j < number_map[i];j++) fprintf(file, "%f\n", memory[j]);
+
+					delete[] memory;
 				}
 
 				int lower_layer_index	= (h == 1) ? (i - atoi(strstr(type_layer[i], "sc") + 2)):(i - 1);
 				int number_parameter	= number_map[i] * (number_map[lower_layer_index] + 1) * length_filter[i] * length_filter[i];
 
-				for(int j = 0;j < number_parameter;j++){
-					fprintf(file, "%f\n", weight[h][i][j]);
-				}
+				cudaMemcpy(parameter = new float[number_parameter], weight[h][i], sizeof(float) * number_parameter, cudaMemcpyDeviceToHost);
+				for(int j = 0;j < number_parameter;j++) fprintf(file, "%f\n", parameter[j]);
+
+				delete[] parameter;
 			}
 		}
 	}
@@ -1260,19 +1280,19 @@ void Convolutional_Neural_Networks_CUDA::Test(int batch_size, float **input, flo
 	}
 }
 
-float Convolutional_Neural_Networks_CUDA::Train(int batch_size, int number_train, float epsilon, float learning_rate, float **input, float **target_output){
-	int *index = new int[number_train];
+float Convolutional_Neural_Networks_CUDA::Train(int batch_size, int number_training, float epsilon, float learning_rate, float **input, float **target_output){
+	int *index = new int[number_training];
 
 	float loss = 0;
 
 	float *target_output_batch;
 	float *temporal_loss;
 
-	for(int i = 0;i < number_train;i++){
+	for(int i = 0;i < number_training;i++){
 		index[i] = i;
 	}
-	for(int i = 0;i < number_train;i++){
-		int j = rand() % number_train;
+	for(int i = 0;i < number_training;i++){
+		int j = rand() % number_training;
 		int t = index[i];
 
 		index[i] = index[j];
@@ -1294,7 +1314,7 @@ float Convolutional_Neural_Networks_CUDA::Train(int batch_size, int number_train
 	}
 	this->epsilon = epsilon;
 
-	for(int g = 0, h = 0;g < number_train;g++){
+	for(int g = 0, h = 0;g < number_training;g++){
 		cudaMemcpy(&neuron[0][0][h * number_map[0] * length_map[0] * length_map[0]], input[index[g]], sizeof(float) * number_map[0] * length_map[0] * length_map[0], cudaMemcpyHostToDevice);
 		cudaMemcpy(&target_output_batch[h * number_map[number_layer - 1]], target_output[index[g]], sizeof(float) * number_map[number_layer - 1], cudaMemcpyHostToDevice);
 
@@ -1317,11 +1337,11 @@ float Convolutional_Neural_Networks_CUDA::Train(int batch_size, int number_train
 			int i = number_layer - 1;
 
 			if(strstr(type_layer[i], "ce")){
-				Calculate_Loss<<<1, NUMBER_THREAD>>>(0, batch_size * number_map[i], temporal_loss, neuron[0][i], target_output_batch);
+				::Calculate_Loss<<<1, NUMBER_THREAD>>>(0, batch_size * number_map[i], temporal_loss, neuron[0][i], target_output_batch);
 			}
 			else
 			if(strstr(type_layer[i], "mse")){
-				Calculate_Loss<<<1, NUMBER_THREAD>>>(1, batch_size * number_map[i], temporal_loss, neuron[0][i], target_output_batch);
+				::Calculate_Loss<<<1, NUMBER_THREAD>>>(1, batch_size * number_map[i], temporal_loss, neuron[0][i], target_output_batch);
 			}
 		}
 	}
@@ -1329,8 +1349,8 @@ float Convolutional_Neural_Networks_CUDA::Train(int batch_size, int number_train
 	for(int h = 0;h < number_parameter_type;h++){
 		for(int i = 0;i < number_layer;i++){
 			if(Access_Parameter(h, i) && strstr(type_layer[i], "bn")){
-				Multiply<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], sum_mean[h][i],		(double)batch_size / number_train, mean[h][i]);
-				Multiply<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], sum_variance[h][i],	(double)batch_size / (batch_size - 1) * batch_size / number_train, variance[h][i]);
+				::Multiply<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], sum_mean[h][i],		(double)batch_size / number_training, mean[h][i]);
+				::Multiply<<<number_map[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_map[i], sum_variance[h][i],	(double)batch_size / (batch_size - 1) * batch_size / number_training, variance[h][i]);
 			}
 		}
 	}
@@ -1341,5 +1361,5 @@ float Convolutional_Neural_Networks_CUDA::Train(int batch_size, int number_train
 	cudaFree(temporal_loss);
 	delete[] index;
 
-	return loss / number_train;
+	return loss / number_training;
 }
