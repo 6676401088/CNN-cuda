@@ -1,5 +1,5 @@
 # CNN-cuda
-cuda implementation of [Convolutional Neural Networks](https://github.com/paperrune/Neural-Networks/tree/master/Convolutional_Neural_Networks).</br></br>
+cuda implementation of [Convolutional Neural Networks](https://github.com/paperrune/Neural-Networks/tree/master/Convolutional_Neural_Networks)</br></br>
 
 ## Features
 - Multi-GPU is not supported.
