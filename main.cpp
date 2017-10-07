@@ -175,8 +175,7 @@ int main(){
 		for(int h = 0;h < batch_size;h++){
 			output[h] = new float[number_map[number_layer - 1]];
 		}
-		// Do not calculate the accuracy of training data to reduce computational cost.
-		for(int i = number_training;i < number_training + number_test;i += batch_size){
+		for(int i = 0;i < number_training + number_test;i += batch_size){
 			int test_batch_size = (i + batch_size < number_training + number_test) ? (batch_size):(number_training + number_test - i);
 
 			CNN->Test(test_batch_size, &input[i], output);
