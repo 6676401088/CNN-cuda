@@ -134,58 +134,60 @@ void Read_Data(char data[], char folder_path[], int number_traininging, int numb
 }
 
 int main(){
-	char *type_layer[] = {"CIFAR-10", "Cbn,fs3 /sc",
-							"Cbn,fs3",     "Cbn,fs3 /sc2",		"Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
-							"Cbn,fs3,st2", "Cbn,fs3 /psc2,st2", "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
-							"Cbn,fs3,st2", "Cbn,fs3 /psc2,st2", "Cbn,fs3", "Cbn,fs3 /sc2", "Cbn,fs3", "Cbn,fs3 /sc2",
+	char *type_layer[] = {"CIFAR-10", "Cbn,ks3 /sc",
+							"Cbn,ks3",     "Cbn,ks3 /sc2",		"Cbn,ks3", "Cbn,ks3 /sc2", "Cbn,ks3", "Cbn,ks3 /sc2",
+							"Cbn,ks3,st2", "Cbn,ks3 /psc2,st2", "Cbn,ks3", "Cbn,ks3 /sc2", "Cbn,ks3", "Cbn,ks3 /sc2",
+							"Cbn,ks3,st2", "Cbn,ks3 /psc2,st2", "Cbn,ks3", "Cbn,ks3 /sc2", "Cbn,ks3", "Cbn,ks3 /sc2",
 							"Pavg", "Lce,sm"};
 
-	int batch_size		 = 50;
-	int length_map[]	 = {32,	32, 32, 32, 32, 32, 32, 32, 16, 16, 16, 16, 16, 16,  8,  8,  8,  8,  8,  8,  1,  1};
-	int number_map[]	 = { 3, 16, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 64, 64, 64, 64, 64, 64, 64, 10};
-	int number_iteration = 100;
-	int number_layer	 = sizeof(type_layer) / sizeof(type_layer[0]);
-	int number_training	 = 50000;
-	int number_test		 = 10000;
+	int batch_size			= 50;
+	int map_width[]			= {32, 32, 32, 32, 32, 32, 32, 32, 16, 16, 16, 16, 16, 16,  8,  8,  8,  8,  8,  8,  1,  1};
+	int map_height[]		= {32, 32, 32, 32, 32, 32, 32, 32, 16, 16, 16, 16, 16, 16,  8,  8,  8,  8,  8,  8,  1,  1};
+	int number_maps[]		= { 3, 16, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 64, 64, 64, 64, 64, 64, 64, 10};
+	int number_iterations	= 100;
+	int number_layers		= sizeof(type_layer) / sizeof(type_layer[0]);
+	int number_training		= 5000;
+	int number_test			= 1000;
 
 	float epsilon		= 0.001;
-	float learning_rate	= 0.002;
+	float learning_rate	= 0.005;
+	float decay_rate	= 0.955;
 
 	float **input			= new float*[number_training + number_test];
 	float **target_output	= new float*[number_training + number_test];
 
-	Convolutional_Neural_Networks_CUDA *CNN = new Convolutional_Neural_Networks_CUDA(type_layer, number_layer, length_map, number_map);
+	Convolutional_Neural_Networks_CUDA CNN = Convolutional_Neural_Networks_CUDA(type_layer, number_layers, map_width, map_height, number_maps);
 
 	for(int h = 0;h < number_training + number_test;h++){
-		input[h]		 = new float[number_map[0] * length_map[0] * length_map[0]];
-		target_output[h] = new float[number_map[number_layer - 1]];
+		input[h]		 = new float[number_maps[0] * map_height[0] * map_width[0]];
+		target_output[h] = new float[number_maps[number_layers - 1]];
 	}
 	if(!strcmp(type_layer[0], "CIFAR-10"))	Read_Data("CIFAR-10", "", number_training, number_test, input, target_output);
 	if(!strcmp(type_layer[0], "MNIST"))		Read_Data("MNIST", "", number_training, number_test, input, target_output);
 
-	CNN->Initialize_Parameter(0, 0.2, -0.1);
+	CNN.Initialize_Parameter(0, 0.2, -0.1);
 
-	for(int g = 0, time = clock();g < number_iteration;g++){
+	for(int g = 0, time = clock();g < number_iterations;g++){
 		int number_correct[2] = {0, };
 
-		float loss = CNN->Train(batch_size, number_training, epsilon, learning_rate, input, target_output);	
+		float loss = CNN.Train(batch_size, number_training, epsilon, learning_rate, input, target_output);	
 
 		float **output = new float*[batch_size];
 		
 		for(int h = 0;h < batch_size;h++){
-			output[h] = new float[number_map[number_layer - 1]];
+			output[h] = new float[number_maps[number_layers - 1]];
 		}
 		for(int i = 0;i < number_training + number_test;i += batch_size){
 			int test_batch_size = (i + batch_size < number_training + number_test) ? (batch_size):(number_training + number_test - i);
 
-			CNN->Test(test_batch_size, &input[i], output);
+			CNN.Test(test_batch_size, &input[i], output);
 
 			for(int h = 0;h < test_batch_size;h++){
 				int argmax;
 
 				float max = 0;
 
-				for(int j = 0;j < number_map[number_layer - 1];j++){
+				for(int j = 0;j < number_maps[number_layers - 1];j++){
 					if(max < output[h][j]){
 						argmax = j;
 						max = output[h][j];
@@ -195,7 +197,7 @@ int main(){
 			}
 		}
 		printf("score: %d / %d, %d / %d  loss: %lf  step %d  %.2lf sec\n", number_correct[0], number_training, number_correct[1], number_test, loss, g + 1, (float)(clock() - time) / CLOCKS_PER_SEC);
-		learning_rate *= 0.955;
+		learning_rate *= decay_rate;
 
 		for(int h = 0;h < batch_size;h++){
 			delete[] output[h];
@@ -209,7 +211,6 @@ int main(){
 	}
 	delete[] input;
 	delete[] target_output;
-	delete CNN;
 
 	return 0;
 }
