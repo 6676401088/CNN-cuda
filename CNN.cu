@@ -1000,7 +1000,7 @@ Convolutional_Neural_Networks_CUDA::Convolutional_Neural_Networks_CUDA(char **ty
 
 	batch_size				= 1;
 	number_memory_types		= 6;
-	number_parameters_types	= 2;
+	number_parameter_types	= 2;
 
 	for(int i = 0;i < number_layers;i++){
 		this->type_layer[i]	 = new char[strlen(type_layer[i]) + 1];
@@ -1061,14 +1061,14 @@ Convolutional_Neural_Networks_CUDA::Convolutional_Neural_Networks_CUDA(char **ty
 		}
 	}
 
-	gamma		 = new float**[number_parameters_types];
-	beta		 = new float**[number_parameters_types];
-	mean		 = new float**[number_parameters_types];
-	variance	 = new float**[number_parameters_types];
-	sum_mean	 = new float**[number_parameters_types];
-	sum_variance = new float**[number_parameters_types];
+	gamma		 = new float**[number_parameter_types];
+	beta		 = new float**[number_parameter_types];
+	mean		 = new float**[number_parameter_types];
+	variance	 = new float**[number_parameter_types];
+	sum_mean	 = new float**[number_parameter_types];
+	sum_variance = new float**[number_parameter_types];
 
-	for(int h = 0;h < number_parameters_types;h++){
+	for(int h = 0;h < number_parameter_types;h++){
 		gamma[h]		= new float*[number_layers];
 		beta[h]			= new float*[number_layers];
 		mean[h]			= new float*[number_layers];
@@ -1105,9 +1105,9 @@ Convolutional_Neural_Networks_CUDA::Convolutional_Neural_Networks_CUDA(char **ty
 		}
 	}
 
-	weight = new float**[number_parameters_types];
+	weight = new float**[number_parameter_types];
 
-	for(int h = 0;h < number_parameters_types;h++){
+	for(int h = 0;h < number_parameter_types;h++){
 		weight[h] = new float*[number_layers];
 
 		for(int i = 0;i < number_layers;i++){
@@ -1124,7 +1124,7 @@ Convolutional_Neural_Networks_CUDA::Convolutional_Neural_Networks_CUDA(char **ty
 	}
 }
 Convolutional_Neural_Networks_CUDA::~Convolutional_Neural_Networks_CUDA(){
-	for(int h = 0;h < number_parameters_types;h++){
+	for(int h = 0;h < number_parameter_types;h++){
 		for(int i = 0;i < number_layers;i++){
 			if(Access_Parameter(h, i) && strstr(type_layer[i], "bn")){
 				cudaFree(gamma[h][i]);
@@ -1162,7 +1162,7 @@ Convolutional_Neural_Networks_CUDA::~Convolutional_Neural_Networks_CUDA(){
 	delete[] derivative;
 	delete[] neuron;
 
-	for(int h = 0;h < number_parameters_types;h++){
+	for(int h = 0;h < number_parameter_types;h++){
 		for(int i = 0;i < number_layers;i++){
 			if(Access_Parameter(h, i)){
 				cudaFree(weight[h][i]);
@@ -1196,7 +1196,7 @@ Convolutional_Neural_Networks_CUDA::~Convolutional_Neural_Networks_CUDA(){
 }
 
 void Convolutional_Neural_Networks_CUDA::Initialize_Parameter(int seed, double scale, double shift){
-	for(int h = 0;h < number_parameters_types;h++){
+	for(int h = 0;h < number_parameter_types;h++){
 		for(int i = 0;i < number_layers;i++){
 			if(Access_Parameter(h, i)){
 				if(strstr(type_layer[i], "bn")){
@@ -1218,7 +1218,7 @@ void Convolutional_Neural_Networks_CUDA::Load_Parameter(char path[]){
 	if(file){
 		fscanf(file, "%f", &epsilon);
 
-		for(int h = 0;h < number_parameters_types;h++){
+		for(int h = 0;h < number_parameter_types;h++){
 			for(int i = 0;i < number_layers;i++){
 				if(Access_Parameter(h, i)){
 					float *parameter;
@@ -1261,7 +1261,7 @@ void Convolutional_Neural_Networks_CUDA::Save_Parameter(char path[]){
 
 	fprintf(file, "%f\n", epsilon);
 
-	for(int h = 0;h < number_parameters_types;h++){
+	for(int h = 0;h < number_parameter_types;h++){
 		for(int i = 0;i < number_layers;i++){
 			if(Access_Parameter(h, i)){
 				float *parameter;
@@ -1343,7 +1343,7 @@ float Convolutional_Neural_Networks_CUDA::Train(int batch_size, int number_train
 	cudaMemset(temporal_loss, 0, sizeof(float));
 	Resize_Memory(batch_size);
 
-	for(int h = 0;h < number_parameters_types;h++){
+	for(int h = 0;h < number_parameter_types;h++){
 		for(int i = 0;i < number_layers;i++){
 			if(Access_Parameter(h, i) && strstr(type_layer[i], "bn")){
 				cudaMemset(sum_mean[h][i],		0, sizeof(float) * number_maps[i]);
@@ -1385,7 +1385,7 @@ float Convolutional_Neural_Networks_CUDA::Train(int batch_size, int number_train
 		}
 	}
 
-	for(int h = 0;h < number_parameters_types;h++){
+	for(int h = 0;h < number_parameter_types;h++){
 		for(int i = 0;i < number_layers;i++){
 			if(Access_Parameter(h, i) && strstr(type_layer[i], "bn")){
 				::Multiply<<<number_maps[i] / NUMBER_THREAD + 1, NUMBER_THREAD>>>(number_maps[i], sum_mean[h][i],		(double)batch_size / number_training, mean[h][i]);
